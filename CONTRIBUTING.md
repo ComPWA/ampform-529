@@ -1,0 +1,50 @@
+# How to contribute?
+
+[![Open in Visual Studio Code](https://img.shields.io/badge/vscode-open-blue?logo=visualstudiocode)](https://github.dev/ComPWA/ampform-529)
+
+> [!TIP]
+> This package is part of the [ComPWA Organization](https://github.com/ComPWA). For more information about how to contribute to the packages, go to **[compwa.github.io/develop](https://compwa.github.io/develop)**!
+
+To contribute to the project, you need to install the package in a virtual environment. This can be done best with [`uv`](https://docs.astral.sh/uv) (see installation instructions [here](https://docs.astral.sh/uv/getting-started/installation)). For this, you first need to get the source code with [Git](https://git-scm.com):
+
+```shell
+git clone https://github.com/ComPWA/ampform-529
+cd ampform-529
+```
+
+Now it's simply a matter of creating and activating the [virtual environment](https://docs.astral.sh/uv/pip/environments) with [`uv sync`](https://docs.astral.sh/uv/reference/cli/#uv-sync). The dependencies for the project are 'pinned' in each commit through the [`uv.lock` file](https://docs.astral.sh/uv/concepts/projects/layout/#the-lockfile).
+
+```shell
+uv sync --all-extras
+source .venv/bin/activate
+```
+
+Formatting and linting checks are automatically performed when committing changes. This is done with [prek](https://prek.j178.dev), a drop-in replacement for [pre-commit](https://pre-commit.com) that reads the same `.pre-commit-config.yaml` file. To install the hooks in your local repository, [install `prek`](https://prek.j178.dev/installation) with `uv`:
+
+```shell
+uv tool install prek --force-reinstall
+```
+
+and run [`prek install`](https://prek.j178.dev/reference/cli/) **once**:
+
+```shell
+prek install --prepare-hooks
+```
+
+[Poe the Poet](https://poethepoet.natn.io) is used as a task runner. Install it globally (within your home folder) with `uv`:
+
+```shell
+uv tool install poethepoet --force-reinstall --python=3.14
+```
+
+You can see which local CI checks it defines by running
+
+```shell
+poe
+```
+
+For instance, all style checks can be run with
+
+```shell
+poe style
+```

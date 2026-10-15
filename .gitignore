@@ -1,0 +1,13 @@
+__pycache__/
+.cache/
+.ipynb_checkpoints/
+.jupyterlite.doit.db
+.pytest_cache/
+.ruff_cache/
+.venv
+.virtual_documents/
+*.egg-info
+*.py[oc]
+build/
+dist/
+wheels/

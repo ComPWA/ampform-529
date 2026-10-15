@@ -1,0 +1,200 @@
+[project]
+name = "ampform-529"
+version = "0.1.0"
+readme = "README.md"
+requires-python = "~=3.14.0"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = [
+    "ampform @ git+https://github.com/ComPWA/ampform@f481d880c40fa3178718c96b1c254c827f77f393",
+    "ipywidgets",
+    "jupyterlab",
+    "jupyterlite-core",
+    "jupyterlite-pyodide-kernel",
+    "qrules==0.10.10",
+    "sympy",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    { include-group = "jupyter" },
+]
+jupyter = [
+    "jupyter-ruff",
+    "jupyterlab",
+    "jupyterlab-git",
+    "jupyterlab-lsp",
+    "jupyterlab-quickopen",
+    "python-lsp-server",
+]
+
+[tool.compwa.policy]
+repo-name = "ampform-529"
+repo-title = "AmpForm issue 529"
+
+[tool.compwa.policy.nb]
+no-binder = true
+
+[tool.compwa.policy.github]
+dependabot-ecosystems = []
+keep-workflow = [
+    "build.yml",
+    "lock.yml",
+]
+no-cd = true
+no-github-actions = true
+
+[tool.compwa.policy.format]
+no-cspell-update = true
+
+[tool.poe.executor]
+isolated = true
+no-group = "dev"
+type = "uv"
+
+[tool.poe.groups.doc.tasks.doc]
+deps = ["_browser-wheel"]
+cmd = "jupyter lite build --contents content --output-dir dist --piplite-wheels wheels/"
+help = "Build the JupyterLite website"
+
+[tool.poe.groups.doc.tasks.doclive]
+deps = ["_browser-wheel"]
+cmd = "jupyter lite serve --contents content --output-dir dist --piplite-wheels wheels/"
+help = "Set up a server to directly preview changes to the HTML pages"
+
+[tool.poe.groups.notebook]
+heading = "Notebooks"
+
+[tool.poe.groups.notebook.tasks.lab]
+args = [{ name = "paths", default = "", positional = true }]
+cmd = "jupyter lab ${paths}"
+executor = { group = "jupyter" }
+help = "Launch Jupyter Lab"
+
+[tool.poe.groups.notebook.tasks.nb]
+args = [{ name = "paths", default = "content", multiple = true, positional = true }]
+cmd = "pytest --nbmake --nbmake-timeout=0 ${paths}"
+help = "Run all notebooks"
+executor = { with = "nbmake" }
+
+[tool.poe.tasks._browser-wheel]
+cmd = "pip wheel --no-deps --wheel-dir wheels ampform@git+https://github.com/ComPWA/ampform@f481d880c40fa3178718c96b1c254c827f77f393"
+executor = { with = "pip" }
+
+[tool.poe.tasks.all]
+help = "Run all continuous integration (CI) tasks locally"
+ignore_fail = "return_non_zero"
+sequence = [
+    "style",
+    "nb",
+    "doc",
+]
+
+[tool.poe.tasks.style]
+cmd = "prek run --all-files"
+help = "Perform all linting, formatting, and spelling checks"
+
+[tool.poe.tasks.upgrade]
+executor = { type = "simple" }
+help = "Upgrade lock files"
+parallel = [
+    "_upgrade-precommit",
+    "_upgrade-uv",
+]
+
+[tool.poe.tasks._upgrade-precommit]
+cmd = "prek autoupdate"
+executor = { type = "simple" }
+
+[tool.poe.tasks._upgrade-uv]
+cmd = "uv lock --upgrade"
+executor = { type = "simple" }
+
+[tool.ruff]
+extend-include = ["*.ipynb"]
+preview = true
+show-fixes = true
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+
+[tool.ruff.lint]
+allowed-confusables = ["→"]
+ignore = [
+    "DOC",
+    "PTH",
+    "any-type",
+    "if-else-block-instead-of-if-exp",
+    "incorrect-blank-line-before-class",
+    "line-too-long",
+    "logging-f-string",
+    "missing-copyright-notice",
+    "missing-dashed-underline-after-section",
+    "missing-section-name-colon",
+    "missing-trailing-comma",
+    "multi-line-summary-second-line",
+    "non-empty-init-module",
+    "pytest-fixture-incorrect-parentheses-style",
+    "read-whole-file",
+    "reimplemented-starmap",
+    "single-line-implicit-string-concatenation",
+    "undocumented-magic-method",
+    "undocumented-public-class",
+    "undocumented-public-function",
+    "undocumented-public-init",
+    "undocumented-public-method",
+    "unspecified-encoding",
+    "write-whole-file",
+]
+select = ["ALL"]
+task-tags = ["cspell"]
+
+[tool.ruff.lint.flake8-builtins]
+ignorelist = ["display"]
+
+[tool.ruff.lint.flake8-comprehensions]
+allow-dict-calls-with-keyword-arguments = true
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = [
+    "ANN",
+    "C90",
+    "D",
+    "PLR09",
+    "T20",
+    "TC00",
+    "assert",
+    "global-statement",
+    "global-variable-not-assigned",
+    "invalid-argument-name",
+    "magic-value-comparison",
+    "mixed-case-variable-in-global-scope",
+    "non-ascii-name",
+    "non-lowercase-variable-in-function",
+    "too-many-blank-lines",
+    "useless-expression",
+    "useless-semicolon",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.tombi.files]
+exclude = ["**/uv.lock"]
+
+[tool.tombi.format.rules]
+indent-width = 4
+line-width = 88
+
+[tool.tombi.lint.rules]
+key-empty = "off"
+
+[[tool.tombi.schemas]]
+root = "tool.compwa.policy"
+path = "https://raw.githubusercontent.com/ComPWA/policy/0.10.1/compwa-policy.schema.json"
+include = ["pyproject.toml"]
